@@ -24,7 +24,7 @@ import json
 import time
 
 
-def listAllFiles(path):
+def list_all_files(path):
     """
     List all file paths
 
@@ -78,7 +78,7 @@ class VirusTotal(object):
         self.logger.addHandler(self.scrlog)
         self.is_verboselog = False
 
-    def sendFiles(self, filenames):
+    def send_files(self, filenames):
         """
         Send files to scan
         
@@ -101,14 +101,14 @@ class VirusTotal(object):
             else:
                 self.logger.warning("sent: %s, HTTP: %d", os.path.basename(filename), res.status_code)
 
-    def retrieveFilesReport(self, filenames):
+    def retrieve_files_reports(self, filenames):
         """
         Retrieve Report for file
 
         @param filename: target file
         """
         for filename in filenames:
-            res = self.retrieveReport(sha256sum(filename))
+            res = self.retrieve_report(sha256sum(filename))
 
             if res.status_code == self.HTTP_OK:
                 resmap = json.loads(res.text)
@@ -120,7 +120,7 @@ class VirusTotal(object):
             else:
                 self.logger.warning("retrieve report: %s, HTTP: %d", os.path.basename(filename), res.status_code)
 
-    def retrieveFromMeta(self, filename):
+    def retrieve_from_meta(self, filename):
         """
         Retrieve Report for checksums in the metafile
 
@@ -129,7 +129,7 @@ class VirusTotal(object):
         with open(filename) as f:
             for line in f:
                 checksum = line.strip()
-                res = self.retrieveReport(checksum)
+                res = self.retrieve_report(checksum)
 
                 if res.status_code == self.HTTP_OK:
                     resmap = json.loads(res.text)
@@ -141,7 +141,7 @@ class VirusTotal(object):
                 else:
                     self.logger.warning("retrieve report: %s, HTTP: %d", checksum, res.status_code)
 
-    def retrieveReport(self, chksum):
+    def retrieve_report(self, chksum):
         """
         Retrieve Report for the file checksum
 
@@ -194,10 +194,10 @@ if __name__ == "__main__":
     vt.logger.info("API KEY loaded. %s API used.", api_comments[vt.is_public_api])
 
     if args.send:
-        vt.sendFiles(listAllFiles(args.send))
+        vt.send_files(list_all_files(args.send))
 
     if args.retrieve:
-        vt.retrieveFilesReport(listAllFiles(args.retrieve))
+        vt.retrieve_files_reports(list_all_files(args.retrieve))
 
     if args.retrievefrommeta:
-        vt.retrieveFromMeta(args.retrievefrommeta)
+        vt.retrieve_from_meta(args.retrievefrommeta)
